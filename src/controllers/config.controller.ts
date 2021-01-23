@@ -1,75 +1,35 @@
 import {authenticate} from '@loopback/authentication';
+import {service} from '@loopback/core';
 import {
-  Count,
-  CountSchema,
-  Filter,
-  FilterExcludingWhere,
-  repository,
-  Where
+  repository
 } from '@loopback/repository';
 import {
-  del, get,
+  get,
   getModelSchemaRef, param,
 
-
-  patch, post,
-
-
-
-
-  put,
+  patch,
 
   requestBody
 } from '@loopback/rest';
 import {Config} from '../models';
 import {ConfigRepository} from '../repositories';
+import {ConfigService} from '../services';
+
+/*
+1- only need create, save and read
+2- read need userID for each config
+3- We move to service the logic
+*/
 
 @authenticate('jwt')
 export class ConfigController {
   constructor(
     @repository(ConfigRepository)
     public configRepository: ConfigRepository,
+    @service(ConfigService) private configService: ConfigService
   ) { }
 
-  @post('/configs', {
-    responses: {
-      '200': {
-        description: 'Config model instance',
-        content: {'application/json': {schema: getModelSchemaRef(Config)}},
-      },
-    },
-  })
-  async create(
-    @requestBody({
-      content: {
-        'application/json': {
-          schema: getModelSchemaRef(Config, {
-            title: 'NewConfig',
-            exclude: ['id'],
-          }),
-        },
-      },
-    })
-    config: Omit<Config, 'id'>,
-  ): Promise<Config> {
-    return this.configRepository.create(config);
-  }
-
-  @get('/configs/count', {
-    responses: {
-      '200': {
-        description: 'Config model count',
-        content: {'application/json': {schema: CountSchema}},
-      },
-    },
-  })
-  async count(
-    @param.where(Config) where?: Where<Config>,
-  ): Promise<Count> {
-    return this.configRepository.count(where);
-  }
-
-  @get('/configs', {
+  @get('/configs/{userId}', {
     responses: {
       '200': {
         description: 'Array of Config model instances',
@@ -85,74 +45,13 @@ export class ConfigController {
     },
   })
   async find(
-    @param.filter(Config) filter?: Filter<Config>,
-  ): Promise<Config[]> {
-    return this.configRepository.find(filter);
-  }
-
-  @patch('/configs', {
-    responses: {
-      '200': {
-        description: 'Config PATCH success count',
-        content: {'application/json': {schema: CountSchema}},
-      },
-    },
-  })
-  async updateAll(
-    @requestBody({
-      content: {
-        'application/json': {
-          schema: getModelSchemaRef(Config, {partial: true}),
-        },
-      },
-    })
-    config: Config,
-    @param.where(Config) where?: Where<Config>,
-  ): Promise<Count> {
-    return this.configRepository.updateAll(config, where);
-  }
-
-  @get('/configs/{id}', {
-    responses: {
-      '200': {
-        description: 'Config model instance',
-        content: {
-          'application/json': {
-            schema: getModelSchemaRef(Config, {includeRelations: true}),
-          },
-        },
-      },
-    },
-  })
-  async findById(
-    @param.path.string('id') id: string,
-    @param.filter(Config, {exclude: 'where'}) filter?: FilterExcludingWhere<Config>
+    @param.path.string('userId') userId: string,
   ): Promise<Config> {
-    return this.configRepository.findById(id, filter);
+    return await this.configService.readAndCreateConfig(userId)
   }
+
 
   @patch('/configs/{id}', {
-    responses: {
-      '204': {
-        description: 'Config PATCH success',
-      },
-    },
-  })
-  async updateById(
-    @param.path.string('id') id: string,
-    @requestBody({
-      content: {
-        'application/json': {
-          schema: getModelSchemaRef(Config, {partial: true}),
-        },
-      },
-    })
-    config: Config,
-  ): Promise<void> {
-    await this.configRepository.updateById(id, config);
-  }
-
-  @put('/configs/{id}', {
     responses: {
       '204': {
         description: 'Config PUT success',
@@ -164,16 +63,5 @@ export class ConfigController {
     @requestBody() config: Config,
   ): Promise<void> {
     await this.configRepository.replaceById(id, config);
-  }
-
-  @del('/configs/{id}', {
-    responses: {
-      '204': {
-        description: 'Config DELETE success',
-      },
-    },
-  })
-  async deleteById(@param.path.string('id') id: string): Promise<void> {
-    await this.configRepository.deleteById(id);
   }
 }

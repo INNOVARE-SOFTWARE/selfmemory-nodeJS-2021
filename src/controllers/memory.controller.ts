@@ -69,7 +69,8 @@ export class MemoryController {
     return this.memoryRepository.count(where);
   }
 
-  @get('/memories', {
+  //we change this for userID support
+  @get('/memories/{userID}', {
     responses: {
       '200': {
         description: 'Array of Memory model instances',
@@ -85,9 +86,14 @@ export class MemoryController {
     },
   })
   async find(
+    @param.path.string('userID') userID: string,
     @param.filter(Memory) filter?: Filter<Memory>,
   ): Promise<Memory[]> {
-    return this.memoryRepository.find(filter);
+    return this.memoryRepository.find({
+      where: {
+        userId: userID
+      }
+    }, filter);
   }
 
   @patch('/memories', {

@@ -101,7 +101,7 @@ export class UserController {
     return {token};
   }
 
-  @authenticate('jwt')
+  @authenticate('jwt') //Bearer
   @get('/whoAmI', {
     responses: {
       '200': {

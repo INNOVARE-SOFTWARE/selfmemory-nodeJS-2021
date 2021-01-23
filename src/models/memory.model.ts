@@ -1,4 +1,4 @@
-import {Entity, model, property, hasMany} from '@loopback/repository';
+import {Entity, hasMany, model, property} from '@loopback/repository';
 import {Chapter} from './chapter.model';
 
 @model()
@@ -25,7 +25,12 @@ export class Memory extends Entity {
     type: 'date',
     required: true,
   })
-  created: string;
+  created: Date;
+
+  @property({
+    type: 'string',
+  })
+  userId?: string;
 
   @hasMany(() => Chapter)
   chapters: Chapter[];

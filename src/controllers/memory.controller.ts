@@ -1,8 +1,9 @@
 import {authenticate} from '@loopback/authentication';
+import {service} from '@loopback/core';
 import {
   Count,
   CountSchema,
-  Filter,
+
   FilterExcludingWhere,
   repository,
   Where
@@ -10,25 +11,21 @@ import {
 import {
   del, get,
   getModelSchemaRef, param,
-
-
   patch, post,
-
-
-
-
   put,
-
   requestBody
 } from '@loopback/rest';
 import {Memory} from '../models';
 import {MemoryRepository} from '../repositories';
+import {MemoryService} from '../services';
 
 @authenticate('jwt')
 export class MemoryController {
   constructor(
     @repository(MemoryRepository)
     public memoryRepository: MemoryRepository,
+    @service(MemoryService)
+    public memoryService: MemoryService,
   ) { }
 
   @post('/memories', {
@@ -70,7 +67,7 @@ export class MemoryController {
   }
 
   //we change this for userID support
-  @get('/memories/{userID}', {
+  @get('/memories/user/{userID}', {
     responses: {
       '200': {
         description: 'Array of Memory model instances',
@@ -86,14 +83,9 @@ export class MemoryController {
     },
   })
   async find(
-    @param.path.string('userID') userID: string,
-    @param.filter(Memory) filter?: Filter<Memory>,
-  ): Promise<Memory[]> {
-    return this.memoryRepository.find({
-      where: {
-        userId: userID
-      }
-    }, filter);
+    @param.path.string('userID') userID: string
+  ): Promise<Memory> {
+    return await this.memoryService.readAndCreateMemory(userID)
   }
 
   @patch('/memories', {

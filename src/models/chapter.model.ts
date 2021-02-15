@@ -22,9 +22,9 @@ export class Chapter extends Entity {
 
   @property({
     type: 'date',
-    required: true,
+    required: false,
   })
-  created: string;
+  created?: Date = new Date();
 
   @property({
     type: 'string',

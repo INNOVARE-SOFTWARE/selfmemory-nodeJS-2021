@@ -146,7 +146,8 @@ export class MemoryController {
       },
     })
     memory: Memory,
-  ): Promise<void> {
+  ): Promise<void> { //void return
+    console.log(memory)
     await this.memoryRepository.updateById(id, memory);
   }
 
@@ -173,5 +174,24 @@ export class MemoryController {
   })
   async deleteById(@param.path.string('id') id: string): Promise<void> {
     await this.memoryRepository.deleteById(id);
+  }
+
+  //export book
+  @get('/memories/book/{userid}', {
+    responses: {
+      '200': {
+        description: 'Memory model instance',
+        content: {
+          'application/json': {
+            schema: getModelSchemaRef(Memory, {includeRelations: true}),
+          },
+        },
+      },
+    },
+  })
+  async book(
+    @param.path.string('userid') userid: string,
+  ): Promise<any> {
+    return await this.memoryService.exportBook(userid)
   }
 }

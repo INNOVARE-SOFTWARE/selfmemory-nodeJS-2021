@@ -1,12 +1,12 @@
 import { /* inject, */ BindingScope, injectable} from '@loopback/core';
 import {repository} from '@loopback/repository';
 import {Memory} from '../models';
-import {MemoryRepository} from '../repositories';
+import {ChapterRepository, MemoryRepository} from '../repositories';
 
 @injectable({scope: BindingScope.TRANSIENT})
 export class MemoryService {
-  constructor(@repository(MemoryRepository)
-  public memoryRepository: MemoryRepository,) { }
+  constructor(@repository(MemoryRepository) public memoryRepository: MemoryRepository,
+    @repository(ChapterRepository) public chapterRepository: ChapterRepository) { }
 
 
   async readAndCreateMemory(userId: string): Promise<Memory> {
@@ -27,6 +27,40 @@ export class MemoryService {
       var saved = this.memoryRepository.save(memory)
       return saved
     }
+
+  }
+
+  async exportBook(userId: string) {
+    const memory = await this.memoryRepository.findOne({
+      where: {
+        userId: userId
+      },
+      include: ['chapters']
+    })
+    var book = ''
+
+
+    if (memory) {
+      book += memory.title
+      book += '\n'
+      book += memory.subtitle
+      book += '\n'
+      book += '-----------------------'
+      book += '\n'
+
+      if (memory.chapters) {
+        memory.chapters.forEach(c => {
+          book += '\n'
+          book += c.title
+          book += '\n'
+          book += c.text
+          book += '\n'
+          book += '-----------------------'
+        })
+      }
+      return book
+    }
+    return ''
 
   }
 }

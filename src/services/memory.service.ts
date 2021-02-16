@@ -83,7 +83,8 @@ export class MemoryService {
 
   }
 
-  sendEmail(to: string, txt: string) {
+  //Enviamos los emails, utilizamos MailGun de manera asíncrona.
+  async sendEmail(to: string, txt: string) {
     var api_key = MAILGUN_API_KEY;
     var domain = MAILGUN_DOMAIN;
     var mailgun = require('mailgun-js')({apiKey: api_key, domain: domain});

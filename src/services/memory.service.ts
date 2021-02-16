@@ -4,9 +4,9 @@ import {Memory} from '../models';
 import {ChapterRepository, ConfigRepository, MemoryRepository} from '../repositories';
 
 
-let MAILGUN_API_KEY = 'key-6c26133f71600c088ac81b102f6233ec'
-let MAILGUN_DOMAIN = 'sandbox54f649cf47f543d599bd458567d9cb18.mailgun.org'
-let MAILGUN_EMAIL_FROM = 'admin@innovare.com.ar'
+let MAILGUN_API_KEY = 'key-6c26133f71600c088ac81b102f6233ec' //replace for you key
+let MAILGUN_DOMAIN = 'sandbox54f649cf47f543d599bd458567d9cb18.mailgun.org'  //replace for you domain
+let MAILGUN_EMAIL_FROM = 'admin@innovare.com.ar'  //replace for you email
 
 
 @injectable({scope: BindingScope.TRANSIENT})

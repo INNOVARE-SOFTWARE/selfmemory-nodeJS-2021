@@ -57,7 +57,7 @@ export class MemoryService {
       book += '\n'
 
       if (memory.chapters) {
-        memory.chapters.forEach(c => {
+        memory.chapters.forEach(c => { //every chapter
           book += '\n'
           book += c.title
           book += '\n'
